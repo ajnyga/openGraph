@@ -1,11 +1,11 @@
 <?php
 
 /**
- * @file plugins/generic/openGraph/OpenGraphPlugin.inc.php
+ * @file OpenGraphPlugin.inc.php
  *
  * Copyright (c) 2014-2020 Simon Fraser University
  * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Distributed under the GNU GPL v3. For full terms see the file LICENSE.
  *
  * @class OpenGraphPlugin
  * @ingroup plugins_generic_openGraph
@@ -78,7 +78,7 @@ class OpenGraphPlugin extends GenericPlugin {
 		if ($submissionCoverImage = $submission->getLocalizedCoverImageUrl()){
 			$openGraphImage = $submissionCoverImage;
 		}
-		$templateMgr->addHeader('openGraphImage', '<meta name="og:image" content="' . $openGraphImage . '"/>');
+		$templateMgr->addHeader('openGraphImage', '<meta name="og:image" content="' . htmlspecialchars($openGraphImage) . '"/>');
 
 		if ($datePublished = $submission->getDatePublished())$templateMgr->addHeader('openGraphDate', '<meta name="article:published_time" content="' . strftime('%Y-%m-%d', strtotime($datePublished)) . '"/>');
 
