@@ -15,6 +15,4 @@
 	<type>plugins.generic</type>
 	<release>1.0.1.0</release>
 	<date>2021-02-08</date>
-	<lazy-load>1</lazy-load>
-	<class>OpenGraphPlugin</class>
 </version>
