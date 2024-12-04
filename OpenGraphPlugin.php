@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file OpenGraphPlugin.inc.php
+ * @file OpenGraphPlugin.php
  *
  * Copyright (c) 2014-2024 Simon Fraser University
  * Copyright (c) 2003-2024 John Willinsky
@@ -13,7 +13,15 @@
  * @brief Inject Open Graph meta tags into submission views in OJS, OMP and OPS and issue view in OJS.
  */
 
-import('lib.pkp.classes.plugins.GenericPlugin');
+ namespace APP\plugins\generic\openGraph;
+
+ use APP\core\Application;
+ use APP\template\TemplateManager;
+ use PKP\core\PKPString;
+ use PKP\db\DAORegistry;
+ use PKP\facades\Locale;
+ use PKP\plugins\GenericPlugin;
+ use PKP\plugins\Hook;
 
 class OpenGraphPlugin extends GenericPlugin {
 	/**
