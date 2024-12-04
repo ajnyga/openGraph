@@ -3,7 +3,7 @@ Exposes OJS, OMP and OPS metadata using the Open Graph protocol (https://ogp.me/
 
 The metadata is used when published submissions and issues are shared in Facebook and LinkedIn.
 
-OJS, OMP and OPS 3.3
+OJS, OMP and OPS 3.4
 
 ***
 Plugin created by The Federation of Finnish Learned Societies (https://tsv.fi/en/).
