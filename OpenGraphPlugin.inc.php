@@ -116,9 +116,11 @@ class OpenGraphPlugin extends GenericPlugin {
 		if ($contextPageHeaderLogo = $context->getLocalizedData('pageHeaderLogoImage')){
 			$openGraphImage = $templateMgr->getTemplateVars('publicFilesDir') . "/" . $contextPageHeaderLogo['uploadName'];
 		}
-		if ($issue && $issueCoverImage = $issue->getLocalizedCoverImageUrl()){
+
+		if (isset($issue) && $issueCoverImage = $issue->getLocalizedCoverImageUrl()){
 			$openGraphImage = $issueCoverImage;
 		}
+
 		if ($submissionCoverImage = $submission->getCurrentPublication()->getLocalizedCoverImageUrl($submission->getData('contextId'))){
 			$openGraphImage = $submissionCoverImage;
 		}
