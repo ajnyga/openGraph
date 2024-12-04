@@ -3,14 +3,14 @@
 /**
  * @file OpenGraphPlugin.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
+ * Copyright (c) 2014-2024 Simon Fraser University
+ * Copyright (c) 2003-2024 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file LICENSE.
  *
  * @class OpenGraphPlugin
  * @ingroup plugins_generic_openGraph
  *
- * @brief Inject Open Graph meta tags into submission views to facilitate indexing.
+ * @brief Inject Open Graph meta tags into submission views in OJS, OMP and OPS and issue view in OJS.
  */
 
 import('lib.pkp.classes.plugins.GenericPlugin');
@@ -24,7 +24,8 @@ class OpenGraphPlugin extends GenericPlugin {
 			if ($this->getEnabled($mainContextId)) {
 				HookRegistry::register('ArticleHandler::view', array(&$this, 'submissionView'));
 				HookRegistry::register('PreprintHandler::view', array(&$this, 'submissionView'));
-				 HookRegistry::register('CatalogBookHandler::book',array(&$this, 'submissionView'));
+				HookRegistry::register('CatalogBookHandler::book',array(&$this, 'submissionView'));
+				HookRegistry::register('TemplateManager::display',array(&$this, 'issueView'));
 			}
 			return true;
 		}
@@ -38,6 +39,41 @@ class OpenGraphPlugin extends GenericPlugin {
 	 */
 	function getContextSpecificPluginSettingsFile() {
 		return $this->getPluginPath() . '/settings.xml';
+	}
+
+	/**
+	 * Inject Open Graph metadata into issue landing page view
+	 * @param $hookName string
+	 * @param $args array
+	 * @return boolean
+	 */
+	function issueView($hookName, $args) {
+		$template = $args[1];
+
+		if ($template == 'frontend/pages/issue.tpl') {
+			$templateMgr = $args[0];
+			$request = $this->getRequest();
+			$context = $request->getContext();
+			$issue = $templateMgr->getTemplateVars('issue');
+			if ($issue){
+				$templateMgr = TemplateManager::getManager($request);
+				$templateMgr->addHeader('openGraphSiteName', '<meta property="og:site_name" content="' . htmlspecialchars($context->getName($context->getPrimaryLocale())) . '"/>');
+				$templateMgr->addHeader('openGraphObjectType', '<meta property="og:type" content="website"/>');
+				$templateMgr->addHeader('openGraphTitle', '<meta property="og:title" content="' . htmlspecialchars($context->getName($context->getPrimaryLocale())) . " " . htmlspecialchars($issue->getIssueIdentification()) . '"/>');
+				$templateMgr->addHeader('openGraphUrl', '<meta property="og:url" content="' . $request->url(null, 'issue', 'view', array($issue->getBestIssueId())) . '"/>');
+				$templateMgr->addHeader('openGraphLocale', '<meta property="og:locale" content="' . htmlspecialchars($context->getPrimaryLocale()) . '"/>');
+				if ($issue && $issueCoverImage = $issue->getLocalizedCoverImageUrl()){
+					$templateMgr->addHeader('openGraphImage', '<meta name="image" property="og:image" content="' . htmlspecialchars($issueCoverImage) . '"/>');
+					$templateMgr->addHeader('twitterCard', '<meta name="twitter:card" content="summary_large_image" />');
+					$templateMgr->addHeader('twitterSiteName', '<meta name="twitter:site" content="' . htmlspecialchars($context->getName($context->getPrimaryLocale())) . '"/>');
+					$templateMgr->addHeader('twitterTitle', '<meta name="twitter:title" content="' . htmlspecialchars($context->getName($context->getPrimaryLocale())) . " " . htmlspecialchars($issue->getIssueIdentification()) . '"/>');
+					$templateMgr->addHeader('twitterImage', '<meta name="twitter:image" content="' . htmlspecialchars($issueCoverImage) . '"/>');
+				}
+			}
+		}
+	
+		return false;
+
 	}
 
 	/**
@@ -69,11 +105,11 @@ class OpenGraphPlugin extends GenericPlugin {
 		}
 
 		$templateMgr = TemplateManager::getManager($request);
-		$templateMgr->addHeader('openGraphSiteName', '<meta name="og:site_name" content="' . htmlspecialchars($context->getName($context->getPrimaryLocale())) . '"/>');
-		$templateMgr->addHeader('openGraphObjectType', '<meta name="og:type" content="' . htmlspecialchars($objectType) . '"/>');
-		$templateMgr->addHeader('openGraphTitle', '<meta name="og:title" content="' . htmlspecialchars($submission->getFullTitle($submission->getLocale())) . '"/>');
+		$templateMgr->addHeader('openGraphSiteName', '<meta property="og:site_name" content="' . htmlspecialchars($context->getName($context->getPrimaryLocale())) . '"/>');
+		$templateMgr->addHeader('openGraphObjectType', '<meta property="og:type" content="' . htmlspecialchars($objectType) . '"/>');
+		$templateMgr->addHeader('openGraphTitle', '<meta property="og:title" content="' . htmlspecialchars($submission->getFullTitle($submission->getLocale())) . '"/>');
 		if ($abstract = PKPString::html2text($submission->getAbstract($submission->getLocale()))) $templateMgr->addHeader('openGraphDescription', '<meta name="description" property="og:description" content="' . htmlspecialchars($abstract) . '"/>');
-		$templateMgr->addHeader('openGraphUrl', '<meta name="og:url" content="' . $request->url(null, $submissionPath[0], $submissionPath[1], array($submission->getBestId())) . '"/>');
+		$templateMgr->addHeader('openGraphUrl', '<meta property="og:url" content="' . $request->url(null, $submissionPath[0], $submissionPath[1], array($submission->getBestId())) . '"/>');
 		if ($locale = $submission->getLocale()) $templateMgr->addHeader('openGraphLocale', '<meta name="og:locale" content="' . htmlspecialchars($locale) . '"/>');
 
 		$openGraphImage = "";
@@ -133,5 +169,3 @@ class OpenGraphPlugin extends GenericPlugin {
 		return __('plugins.generic.openGraph.description');
 	}
 }
-
-
