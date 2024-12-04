@@ -30,10 +30,10 @@ class OpenGraphPlugin extends GenericPlugin {
 	function register($category, $path, $mainContextId = null) {
 		if (parent::register($category, $path, $mainContextId)) {
 			if ($this->getEnabled($mainContextId)) {
-				HookRegistry::register('ArticleHandler::view', array(&$this, 'submissionView'));
-				HookRegistry::register('PreprintHandler::view', array(&$this, 'submissionView'));
-				HookRegistry::register('CatalogBookHandler::book',array(&$this, 'submissionView'));
-				HookRegistry::register('TemplateManager::display',array(&$this, 'issueView'));
+				Hook::add('ArticleHandler::view', $this->submissionView(...));
+				Hook::add('PreprintHandler::view', $this->submissionView(...));
+				Hook::add('CatalogBookHandler::book', $this->submissionView(...));
+				Hook::add('TemplateManager::display', $this->issueView(...));
 			}
 			return true;
 		}
@@ -153,7 +153,7 @@ class OpenGraphPlugin extends GenericPlugin {
 
 		$i=0;
 		$dao = DAORegistry::getDAO('SubmissionKeywordDAO');
-		$keywords = $dao->getKeywords($submission->getCurrentPublication()->getId(), array(AppLocale::getLocale()));
+		$keywords = $dao->getKeywords($submission->getCurrentPublication()->getId(), array(Locale::getLocale()));
 		foreach ($keywords as $locale => $localeKeywords) {
 			foreach ($localeKeywords as $keyword) {
 				$templateMgr->addHeader('openGraphArticleTag' . $i++, '<meta name="' . $objectType . ':tag" content="' . htmlspecialchars($keyword) . '"/>');
