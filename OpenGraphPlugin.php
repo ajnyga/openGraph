@@ -151,14 +151,19 @@ class OpenGraphPlugin extends GenericPlugin {
 		}
 
 		if ($applicationName == "omp") { 
+			$isbns = array();
 			$publicationFormats = $publication->getData('publicationFormats');
 			foreach ($publicationFormats as $publicationFormat) {
 				$identificationCodes = $publicationFormat->getIdentificationCodes();
 				while ($identificationCode = $identificationCodes->next()) {
 					if ($identificationCode->getCode() == "02" || $identificationCode->getCode() == "15") {
-						$templateMgr->addHeader('openGraphBookIsbn', '<meta property="book:isbn" content="' . htmlspecialchars($identificationCode->getValue()) . '"/>');
+						$isbns[$identificationCode->getValue()] = true;
 					}
 				}
+			}
+			$j = 0;
+			foreach (array_keys($isbns) as $isbn) {
+				$templateMgr->addHeader('openGraphBookIsbn' . $j++, '<meta property="book:isbn" content="' . htmlspecialchars($isbn) . '"/>');
 			}
 		}
 
