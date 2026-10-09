@@ -68,7 +68,7 @@ class OpenGraphPlugin extends GenericPlugin {
 				$templateMgr->addHeader('openGraphSiteName', '<meta property="og:site_name" content="' . htmlspecialchars($context->getName($context->getPrimaryLocale())) . '"/>');
 				$templateMgr->addHeader('openGraphObjectType', '<meta property="og:type" content="website"/>');
 				$templateMgr->addHeader('openGraphTitle', '<meta property="og:title" content="' . htmlspecialchars($context->getName($context->getPrimaryLocale())) . " " . htmlspecialchars($issue->getIssueIdentification()) . '"/>');
-				$templateMgr->addHeader('openGraphUrl', '<meta property="og:url" content="' . $request->url(null, 'issue', 'view', array($issue->getBestIssueId())) . '"/>');
+				$templateMgr->addHeader('openGraphUrl', '<meta property="og:url" content="' . htmlspecialchars($request->url(null, 'issue', 'view', array($issue->getBestIssueId()))) . '"/>');
 				$templateMgr->addHeader('openGraphLocale', '<meta property="og:locale" content="' . htmlspecialchars($context->getPrimaryLocale()) . '"/>');
 				if ($issue && $issueCoverImage = $issue->getLocalizedCoverImageUrl()){
 					$templateMgr->addHeader('openGraphImage', '<meta name="image" property="og:image" content="' . htmlspecialchars($issueCoverImage) . '"/>');
@@ -121,7 +121,7 @@ class OpenGraphPlugin extends GenericPlugin {
 		$templateMgr->addHeader('openGraphObjectType', '<meta property="og:type" content="' . htmlspecialchars($objectType) . '"/>');
 		$templateMgr->addHeader('openGraphTitle', '<meta property="og:title" content="' . htmlspecialchars($publication->getLocalizedFullTitle($publicationLocale)) . '"/>');
 		if ($abstract = PKPString::html2text($publication->getLocalizedData('abstract', $publicationLocale))) $templateMgr->addHeader('openGraphDescription', '<meta name="description" property="og:description" content="' . htmlspecialchars($abstract) . '"/>');
-		$templateMgr->addHeader('openGraphUrl', '<meta property="og:url" content="' . $request->url(null, $submissionPath[0], $submissionPath[1], array($submission->getBestId())) . '"/>');
+		$templateMgr->addHeader('openGraphUrl', '<meta property="og:url" content="' . htmlspecialchars($request->url(null, $submissionPath[0], $submissionPath[1], array($submission->getBestId()))) . '"/>');
 		if ($locale = $publicationLocale) $templateMgr->addHeader('openGraphLocale', '<meta name="og:locale" content="' . htmlspecialchars($locale) . '"/>');
 
 		$openGraphImage = "";
