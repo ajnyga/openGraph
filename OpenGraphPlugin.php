@@ -153,10 +153,10 @@ class OpenGraphPlugin extends GenericPlugin {
 		}
 
 		$i=0;
-		$publicationKeywords = $publication->getData('keywords');
-		foreach ($publicationKeywords as $locale => $localeKeywords) {
-			foreach ($localeKeywords as $keyword) {
-				$templateMgr->addHeader('openGraphArticleTag' . $i++, '<meta name="' . $objectType . ':tag" content="' . htmlspecialchars($keyword) . '"/>');
+		$publicationKeywords = $publication->getData('keywords') ?? array();
+		foreach ($publicationKeywords[Locale::getLocale()] ?? array() as $keyword) {
+			if (is_array($keyword) && isset($keyword['name'])) {
+				$templateMgr->addHeader('openGraphArticleTag' . $i++, '<meta name="' . $objectType . ':tag" content="' . htmlspecialchars($keyword['name']) . '"/>');
 			}
 		}
 
