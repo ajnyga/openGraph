@@ -112,14 +112,15 @@ class OpenGraphPlugin extends GenericPlugin {
 			$objectType = "article";
 		}
 		$publication = $submission->getCurrentPublication();
+		$publicationLocale = $publication->getData('locale');
 
 		$templateMgr = TemplateManager::getManager($request);
 		$templateMgr->addHeader('openGraphSiteName', '<meta property="og:site_name" content="' . htmlspecialchars($context->getName($context->getPrimaryLocale())) . '"/>');
 		$templateMgr->addHeader('openGraphObjectType', '<meta property="og:type" content="' . htmlspecialchars($objectType) . '"/>');
-		$templateMgr->addHeader('openGraphTitle', '<meta property="og:title" content="' . htmlspecialchars($publication->getLocalizedFullTitle()) . '"/>');
-		if ($abstract = PKPString::html2text($publication->getLocalizedData('abstract'))) $templateMgr->addHeader('openGraphDescription', '<meta name="description" property="og:description" content="' . htmlspecialchars($abstract) . '"/>');
+		$templateMgr->addHeader('openGraphTitle', '<meta property="og:title" content="' . htmlspecialchars($publication->getLocalizedFullTitle($publicationLocale)) . '"/>');
+		if ($abstract = PKPString::html2text($publication->getLocalizedData('abstract', $publicationLocale))) $templateMgr->addHeader('openGraphDescription', '<meta name="description" property="og:description" content="' . htmlspecialchars($abstract) . '"/>');
 		$templateMgr->addHeader('openGraphUrl', '<meta property="og:url" content="' . $request->url(null, $submissionPath[0], $submissionPath[1], array($submission->getBestId())) . '"/>');
-		if ($locale = $context->getData('primaryLocale')) $templateMgr->addHeader('openGraphLocale', '<meta name="og:locale" content="' . htmlspecialchars($locale) . '"/>');
+		if ($locale = $publicationLocale) $templateMgr->addHeader('openGraphLocale', '<meta name="og:locale" content="' . htmlspecialchars($locale) . '"/>');
 
 		$openGraphImage = "";
 		if ($contextPageHeaderLogo = $context->getLocalizedData('pageHeaderLogoImage')){
