@@ -133,7 +133,7 @@ class OpenGraphPlugin extends GenericPlugin {
 			$openGraphImage = $issueCoverImage;
 		}
 
-		if ($submissionCoverImage = $publication->getLocalizedCoverImageUrl($submission->getData('contextId'))){
+		if ($publication->getLocalizedData('coverImage') && $submissionCoverImage = $publication->getLocalizedCoverImageUrl($submission->getData('contextId'))){
 			$openGraphImage = $submissionCoverImage;
 		}
 		if ($openGraphImage) $templateMgr->addHeader('openGraphImage', '<meta name="image" property="og:image" content="' . htmlspecialchars($openGraphImage) . '"/>');
