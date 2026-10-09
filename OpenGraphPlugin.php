@@ -18,7 +18,6 @@
  use APP\core\Application;
  use APP\template\TemplateManager;
  use PKP\core\PKPString;
- use PKP\db\DAORegistry;
  use PKP\facades\Locale;
  use PKP\plugins\GenericPlugin;
  use PKP\plugins\Hook;
