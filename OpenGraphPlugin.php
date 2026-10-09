@@ -140,7 +140,7 @@ class OpenGraphPlugin extends GenericPlugin {
 
 		if ($datePublished = $publication->getData('datePublished')) { 
 			$openGraphDateName = $applicationName == "omp" ? "book:release_date" : "article:published_time";
-			$templateMgr->addHeader('openGraphDate', '<meta property="' . $openGraphDateName . '" content="' . strftime('%Y-%m-%d', strtotime($datePublished)) . '"/>');
+			$templateMgr->addHeader('openGraphDate', '<meta property="' . $openGraphDateName . '" content="' . date('Y-m-d', strtotime($datePublished)) . '"/>');
 		}
 
 		if ($applicationName == "omp") { 
