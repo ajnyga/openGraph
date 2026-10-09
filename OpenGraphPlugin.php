@@ -69,7 +69,7 @@ class OpenGraphPlugin extends GenericPlugin {
 				$templateMgr->addHeader('openGraphObjectType', '<meta property="og:type" content="website"/>');
 				$templateMgr->addHeader('openGraphTitle', '<meta property="og:title" content="' . htmlspecialchars($context->getName($context->getPrimaryLocale())) . " " . htmlspecialchars($issue->getIssueIdentification()) . '"/>');
 				$templateMgr->addHeader('openGraphUrl', '<meta property="og:url" content="' . htmlspecialchars($request->url(null, 'issue', 'view', array($issue->getBestIssueId()))) . '"/>');
-				$templateMgr->addHeader('openGraphLocale', '<meta property="og:locale" content="' . htmlspecialchars($context->getPrimaryLocale()) . '"/>');
+				$templateMgr->addHeader('openGraphLocale', '<meta property="og:locale" content="' . htmlspecialchars($this->getOpenGraphLocale($context->getPrimaryLocale())) . '"/>');
 				if ($issue && $issueCoverImage = $issue->getLocalizedCoverImageUrl()){
 					$templateMgr->addHeader('openGraphImage', '<meta name="image" property="og:image" content="' . htmlspecialchars($issueCoverImage) . '"/>');
 					$templateMgr->addHeader('twitterCard', '<meta name="twitter:card" content="summary_large_image" />');
@@ -125,7 +125,7 @@ class OpenGraphPlugin extends GenericPlugin {
 		$templateMgr->addHeader('openGraphTitle', '<meta property="og:title" content="' . htmlspecialchars($titleSource->getLocalizedFullTitle($publicationLocale)) . '"/>');
 		if ($abstract = PKPString::html2text($abstractSource->getLocalizedData('abstract', $publicationLocale))) $templateMgr->addHeader('openGraphDescription', '<meta name="description" property="og:description" content="' . htmlspecialchars($abstract) . '"/>');
 		$templateMgr->addHeader('openGraphUrl', '<meta property="og:url" content="' . htmlspecialchars($request->url(null, $submissionPath[0], $submissionPath[1], $chapter ? array($submission->getBestId(), 'chapter', $chapter->getSourceChapterId()) : array($submission->getBestId()))) . '"/>');
-		if ($locale = $publicationLocale) $templateMgr->addHeader('openGraphLocale', '<meta property="og:locale" content="' . htmlspecialchars($locale) . '"/>');
+		if ($locale = $publicationLocale) $templateMgr->addHeader('openGraphLocale', '<meta property="og:locale" content="' . htmlspecialchars($this->getOpenGraphLocale($locale)) . '"/>');
 
 		$openGraphImage = "";
 		if ($contextPageHeaderLogo = $context->getLocalizedData('pageHeaderLogoImage')){
@@ -176,6 +176,41 @@ class OpenGraphPlugin extends GenericPlugin {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Default territory of the languages PKP ships without one, after the
+	 * CLDR likely subtags (pt is the Portugal locale, pt_BR being its own)
+	 */
+	const LANGUAGE_TERRITORIES = array(
+		'an' => 'ES', 'ar' => 'EG', 'az' => 'AZ', 'be' => 'BY', 'bg' => 'BG', 'bs' => 'BA', 'ca' => 'ES',
+		'ckb' => 'IQ', 'cnr' => 'ME', 'cs' => 'CZ', 'da' => 'DK', 'de' => 'DE', 'dsb' => 'DE', 'el' => 'GR',
+		'en' => 'US', 'es' => 'ES', 'eu' => 'ES', 'fa' => 'IR', 'fi' => 'FI', 'fr' => 'FR', 'gd' => 'GB',
+		'gl' => 'ES', 'he' => 'IL', 'hi' => 'IN', 'hr' => 'HR', 'hsb' => 'DE', 'hu' => 'HU', 'hy' => 'AM',
+		'id' => 'ID', 'is' => 'IS', 'it' => 'IT', 'ja' => 'JP', 'ka' => 'GE', 'kk' => 'KZ', 'ko' => 'KR',
+		'ky' => 'KG', 'lol' => 'CD', 'lt' => 'LT', 'lv' => 'LV', 'mk' => 'MK', 'mn' => 'MN', 'mr' => 'IN',
+		'ms' => 'MY', 'nb' => 'NO', 'nl' => 'NL', 'pl' => 'PL', 'ps' => 'AF', 'pt' => 'PT', 'ro' => 'RO',
+		'ru' => 'RU', 'se' => 'NO', 'sk' => 'SK', 'sl' => 'SI', 'sq' => 'AL', 'sr' => 'RS', 'sv' => 'SE',
+		'sw' => 'TZ', 'th' => 'TH', 'tl' => 'PH', 'tr' => 'TR', 'uk' => 'UA', 'ur' => 'PK', 'uz' => 'UZ',
+		'vi' => 'VN',
+	);
+
+	/**
+	 * Convert a PKP locale (en, pt_BR, sr@latin, zh_Hant) to the
+	 * language_TERRITORY format required by og:locale
+	 * @param $locale string
+	 * @return string
+	 */
+	function getOpenGraphLocale($locale) {
+		$parts = explode('_', str_replace('-', '_', strtok((string) $locale, '@')));
+		$language = strtolower($parts[0]);
+		$territory = null;
+		foreach (array_slice($parts, 1) as $part) {
+			if (preg_match('/^[A-Za-z]{2}$/', $part)) $territory = strtoupper($part);
+		}
+		if (!$territory && $language == 'zh') $territory = in_array('Hant', $parts) ? 'TW' : 'CN';
+		if (!$territory) $territory = self::LANGUAGE_TERRITORIES[$language] ?? null;
+		return $territory ? $language . '_' . $territory : $language;
 	}
 
 	/**
