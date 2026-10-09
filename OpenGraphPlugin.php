@@ -97,21 +97,23 @@ class OpenGraphPlugin extends GenericPlugin {
 		$context = $request->getContext();
 		if ($applicationName == "ops"){
 			$submission = $args[1];
+			$publication = $args[2];
 			$submissionPath = array('preprint', 'view');
 			$objectType = "article";
 		}
 		elseif ($applicationName == "omp"){
 			$submission = $args[1];
+			$publication = $args[2];
 			$submissionPath = array('catalog', 'book');
 			$objectType = "book";
 		}
 		else {
 			$issue = $args[1];
 			$submission = $args[2];
+			$publication = $args[3];
 			$submissionPath = array('article', 'view');
 			$objectType = "article";
 		}
-		$publication = $submission->getCurrentPublication();
 		$publicationLocale = $publication->getData('locale');
 
 		$templateMgr = TemplateManager::getManager($request);
@@ -131,7 +133,7 @@ class OpenGraphPlugin extends GenericPlugin {
 			$openGraphImage = $issueCoverImage;
 		}
 
-		if ($submissionCoverImage = $submission->getCurrentPublication()->getLocalizedCoverImageUrl($submission->getData('contextId'))){
+		if ($submissionCoverImage = $publication->getLocalizedCoverImageUrl($submission->getData('contextId'))){
 			$openGraphImage = $submissionCoverImage;
 		}
 		$templateMgr->addHeader('openGraphImage', '<meta name="image" property="og:image" content="' . htmlspecialchars($openGraphImage) . '"/>');
@@ -142,7 +144,7 @@ class OpenGraphPlugin extends GenericPlugin {
 		}
 
 		if ($applicationName == "omp") { 
-			$publicationFormats = $submission->getCurrentPublication()->getData('publicationFormats');
+			$publicationFormats = $publication->getData('publicationFormats');
 			foreach ($publicationFormats as $publicationFormat) {
 				$identificationCodes = $publicationFormat->getIdentificationCodes();
 				while ($identificationCode = $identificationCodes->next()) {
