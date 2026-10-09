@@ -136,7 +136,7 @@ class OpenGraphPlugin extends GenericPlugin {
 		if ($submissionCoverImage = $publication->getLocalizedCoverImageUrl($submission->getData('contextId'))){
 			$openGraphImage = $submissionCoverImage;
 		}
-		$templateMgr->addHeader('openGraphImage', '<meta name="image" property="og:image" content="' . htmlspecialchars($openGraphImage) . '"/>');
+		if ($openGraphImage) $templateMgr->addHeader('openGraphImage', '<meta name="image" property="og:image" content="' . htmlspecialchars($openGraphImage) . '"/>');
 
 		if ($datePublished = $publication->getData('datePublished')) { 
 			$openGraphDateName = $applicationName == "omp" ? "book:release_date" : "article:published_time";
