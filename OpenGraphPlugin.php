@@ -162,6 +162,9 @@ class OpenGraphPlugin extends GenericPlugin
             $isbns = array();
             $publicationFormats = $publication->getData('publicationFormats');
             foreach ($publicationFormats as $publicationFormat) {
+                if (!$publicationFormat->getIsAvailable()) {
+                    continue;
+                }
                 $identificationCodes = $publicationFormat->getIdentificationCodes();
                 while ($identificationCode = $identificationCodes->next()) {
                     if ($identificationCode->getCode() == "02" || $identificationCode->getCode() == "15") {
