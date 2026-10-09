@@ -18,7 +18,6 @@ namespace APP\plugins\generic\openGraph;
 use APP\core\Application;
 use APP\template\TemplateManager;
 use PKP\core\PKPString;
-use PKP\facades\Locale;
 use PKP\plugins\GenericPlugin;
 use PKP\plugins\Hook;
 
@@ -190,7 +189,7 @@ class OpenGraphPlugin extends GenericPlugin
 
         $i = 0;
         $publicationKeywords = $publication->getData('keywords') ?? array();
-        foreach ($publicationKeywords[Locale::getLocale()] ?? array() as $keyword) {
+        foreach ($publicationKeywords[$publicationLocale] ?? array() as $keyword) {
             if (is_array($keyword) && isset($keyword['name'])) {
                 $templateMgr->addHeader('openGraphArticleTag' . $i++, '<meta property="' . $objectType . ':tag" content="' . htmlspecialchars($keyword['name']) . '"/>');
             }
