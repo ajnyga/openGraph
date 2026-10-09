@@ -125,7 +125,7 @@ class OpenGraphPlugin extends GenericPlugin
         $titleSource = $chapter ? $chapter : $publication;
         $abstractSource = $chapter && $chapter->getLocalizedData('abstract', $publicationLocale) ? $chapter : $publication;
         $templateMgr->addHeader('openGraphTitle', '<meta property="og:title" content="' . htmlspecialchars($titleSource->getLocalizedFullTitle($publicationLocale)) . '"/>');
-        if ($abstract = PKPString::html2text($abstractSource->getLocalizedData('abstract', $publicationLocale))) {
+        if ($abstract = trim((string) preg_replace('/\s+/u', ' ', PKPString::html2text($abstractSource->getLocalizedData('abstract', $publicationLocale))))) {
             $templateMgr->addHeader('openGraphDescription', '<meta name="description" property="og:description" content="' . htmlspecialchars($abstract) . '"/>');
         }
         $templateMgr->addHeader('openGraphUrl', '<meta property="og:url" content="' . htmlspecialchars($request->url(null, $submissionPath[0], $submissionPath[1], $chapter ? array($submission->getBestId(), 'chapter', $chapter->getSourceChapterId()) : array($submission->getBestId()))) . '"/>');
