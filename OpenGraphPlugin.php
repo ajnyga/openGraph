@@ -119,9 +119,12 @@ class OpenGraphPlugin extends GenericPlugin {
 		$templateMgr = TemplateManager::getManager($request);
 		$templateMgr->addHeader('openGraphSiteName', '<meta property="og:site_name" content="' . htmlspecialchars($context->getName($context->getPrimaryLocale())) . '"/>');
 		$templateMgr->addHeader('openGraphObjectType', '<meta property="og:type" content="' . htmlspecialchars($objectType) . '"/>');
-		$templateMgr->addHeader('openGraphTitle', '<meta property="og:title" content="' . htmlspecialchars($publication->getLocalizedFullTitle($publicationLocale)) . '"/>');
-		if ($abstract = PKPString::html2text($publication->getLocalizedData('abstract', $publicationLocale))) $templateMgr->addHeader('openGraphDescription', '<meta name="description" property="og:description" content="' . htmlspecialchars($abstract) . '"/>');
-		$templateMgr->addHeader('openGraphUrl', '<meta property="og:url" content="' . htmlspecialchars($request->url(null, $submissionPath[0], $submissionPath[1], array($submission->getBestId()))) . '"/>');
+		$chapter = $applicationName == "omp" ? $args[3] : null;
+		$titleSource = $chapter ? $chapter : $publication;
+		$abstractSource = $chapter && $chapter->getLocalizedData('abstract', $publicationLocale) ? $chapter : $publication;
+		$templateMgr->addHeader('openGraphTitle', '<meta property="og:title" content="' . htmlspecialchars($titleSource->getLocalizedFullTitle($publicationLocale)) . '"/>');
+		if ($abstract = PKPString::html2text($abstractSource->getLocalizedData('abstract', $publicationLocale))) $templateMgr->addHeader('openGraphDescription', '<meta name="description" property="og:description" content="' . htmlspecialchars($abstract) . '"/>');
+		$templateMgr->addHeader('openGraphUrl', '<meta property="og:url" content="' . htmlspecialchars($request->url(null, $submissionPath[0], $submissionPath[1], $chapter ? array($submission->getBestId(), 'chapter', $chapter->getSourceChapterId()) : array($submission->getBestId()))) . '"/>');
 		if ($locale = $publicationLocale) $templateMgr->addHeader('openGraphLocale', '<meta property="og:locale" content="' . htmlspecialchars($locale) . '"/>');
 
 		$openGraphImage = "";
@@ -138,7 +141,11 @@ class OpenGraphPlugin extends GenericPlugin {
 		}
 		if ($openGraphImage) $templateMgr->addHeader('openGraphImage', '<meta name="image" property="og:image" content="' . htmlspecialchars($openGraphImage) . '"/>');
 
-		if ($datePublished = $publication->getData('datePublished')) { 
+		$datePublished = $publication->getData('datePublished');
+		if ($chapter && $submission->getEnableChapterPublicationDates() && $chapter->getDatePublished()) {
+			$datePublished = $chapter->getDatePublished();
+		}
+		if ($datePublished) { 
 			$openGraphDateName = $applicationName == "omp" ? "book:release_date" : "article:published_time";
 			$templateMgr->addHeader('openGraphDate', '<meta property="' . $openGraphDateName . '" content="' . date('Y-m-d', strtotime($datePublished)) . '"/>');
 		}
