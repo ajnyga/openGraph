@@ -19,5 +19,3 @@
 require_once('OpenGraphPlugin.inc.php');
 
 return new OpenGraphPlugin();
-
-
